@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>가정에서 함께해 주세요</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1280px; height: 720px; overflow: hidden; }
+  body {
+    font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    background: #fffaf2; color: #3b2f2a; padding: 80px 100px;
+  }
+  .num { font-size: 24px; font-weight: 700; color: #c0612b; }
+  h1 { font-size: 56px; font-weight: 800; margin: 8px 0 48px; }
+  ol { list-style: none; counter-reset: tip; }
+  li { counter-increment: tip; display: flex; align-items: center; gap: 28px; font-size: 30px; padding: 20px 0; border-bottom: 2px dashed #f1d9bd; }
+  li:last-child { border-bottom: none; }
+  li::before { content: counter(tip); flex: none; width: 56px; height: 56px; border-radius: 50%; background: #f0a35e; color: #fff; font-weight: 800; display: grid; place-items: center; }
+  b { color: #c0612b; }
+</style>
+</head>
+<body>
+  <div class="num">03</div>
+  <h1>가정에서 함께해 주세요</h1>
+  <ol>
+    <li><span>하루 <b>15분</b>, 가족이 함께 책 읽는 시간을 정해 주세요.</span></li>
+    <li><span>책은 <b>아이가 직접 고르도록</b> 해 주세요. 만화책도 괜찮아요.</span></li>
+    <li><span>“어떤 장면이 제일 재미있었어?” 하고 <b>가볍게 물어봐</b> 주세요.</span></li>
+    <li><span>읽는 동안에는 <b>TV와 스마트폰을 잠시 꺼</b> 주세요.</span></li>
+  </ol>
+</body>
+</html>

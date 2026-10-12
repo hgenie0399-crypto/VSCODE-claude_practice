@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>표지</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1280px; height: 720px; overflow: hidden; }
+  body {
+    font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    background: linear-gradient(135deg, #fff8ec 0%, #ffe9c7 100%);
+    color: #3b2f2a;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 0 120px; position: relative;
+  }
+  .tag { font-size: 26px; color: #c0612b; font-weight: 700; letter-spacing: 2px; margin-bottom: 24px; }
+  h1 { font-size: 84px; line-height: 1.2; font-weight: 800; }
+  h2 { font-size: 40px; font-weight: 500; color: #7a5a48; margin-top: 20px; }
+  .meta { margin-top: 64px; font-size: 28px; color: #5d4a40; }
+  .meta span + span::before { content: "·"; margin: 0 16px; color: #c0612b; }
+  .books { position: absolute; right: 110px; bottom: 90px; font-size: 150px; opacity: .9; }
+</style>
+</head>
+<body>
+  <div class="tag">📚 학부모 설명회</div>
+  <h1>{{title}}</h1>
+  <h2>{{subtitle}}</h2>
+  <p class="meta"><span>{{presenter}}</span><span>{{date}}</span></p>
+  <div class="books">📖</div>
+</body>
+</html>

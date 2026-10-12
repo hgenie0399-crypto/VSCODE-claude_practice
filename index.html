@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>우리 반 독서 습관 만들기 - 학부모 설명회</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    background: #2b2420; color: #fff; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  #viewport { flex: 1; position: relative; overflow: hidden; }
+  #stage {
+    position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px;
+    transform-origin: center center; box-shadow: 0 10px 40px rgba(0,0,0,.4); background: #fff;
+  }
+  #stage iframe {
+    position: absolute; inset: 0; width: 1280px; height: 720px; border: 0;
+    pointer-events: none; display: none;
+  }
+  #stage iframe.active { display: block; }
+
+  #bar {
+    height: 56px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 16px;
+    background: #1d1815; font-size: 15px;
+  }
+  #bar .deck-title { flex: 1; opacity: .75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #bar button {
+    font: inherit; color: #fff; background: #3d332d; border: 0; border-radius: 8px;
+    padding: 8px 14px; cursor: pointer;
+  }
+  #bar button:hover { background: #57483f; }
+  #bar button:disabled { opacity: .35; cursor: default; }
+  #counter { min-width: 64px; text-align: center; font-variant-numeric: tabular-nums; }
+
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.6); display: none;
+    align-items: center; justify-content: center; z-index: 10;
+  }
+  .overlay.open { display: flex; }
+  .panel { background: #fff; color: #3b2f2a; border-radius: 16px; padding: 28px 32px; max-width: 90vw; max-height: 85vh; overflow: auto; }
+  .panel h2 { font-size: 22px; margin-bottom: 16px; }
+  #toc-list { list-style: none; min-width: 320px; }
+  #toc-list button {
+    width: 100%; text-align: left; font: inherit; font-size: 18px; background: none; border: 0;
+    padding: 10px 12px; border-radius: 8px; cursor: pointer; color: inherit;
+  }
+  #toc-list button:hover { background: #fff1de; }
+  #toc-list button.current { background: #ffe2bf; font-weight: 700; }
+  #toc-list .n { display: inline-block; width: 36px; color: #c0612b; font-weight: 700; }
+  #qr-box { text-align: center; }
+  #qr-box svg { width: min(60vh, 70vw); height: auto; display: block; margin: 0 auto; }
+  #qr-url { margin-top: 12px; font-size: 14px; color: #6a564b; word-break: break-all; max-width: min(60vh, 70vw); }
+</style>
+</head>
+<body>
+  <div id="viewport"><div id="stage"></div></div>
+
+  <div id="bar">
+    <span class="deck-title">우리 반 독서 습관 만들기 · 담임교사 이하진 · 2026년 10월 26일</span>
+    <button id="btn-toc">목차</button>
+    <button id="btn-qr">QR</button>
+    <button id="btn-fs">전체화면</button>
+    <button id="btn-prev" aria-label="이전">◀</button>
+    <span id="counter"></span>
+    <button id="btn-next" aria-label="다음">▶</button>
+  </div>
+
+  <div class="overlay" id="toc"><div class="panel"><h2>목차</h2><ol id="toc-list"></ol></div></div>
+  <div class="overlay" id="qr"><div class="panel" id="qr-box"><h2>휴대폰으로 보기</h2><div id="qr-code"></div><p id="qr-url"></p></div></div>
+
+<script src="vendor/qrcode.js"></script>
+<script>
+const DECK = {"slides":[{"file":"01-표지.html","title":"표지","html":"\u003c!DOCTYPE html>\n\u003chtml lang=\"ko\">\n\u003chead>\n\u003cmeta charset=\"UTF-8\">\n\u003ctitle>표지\u003c/title>\n\u003cstyle>\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  html, body { width: 1280px; height: 720px; overflow: hidden; }\n  body {\n    font-family: \"Pretendard\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", sans-serif;\n    background: linear-gradient(135deg, #fff8ec 0%, #ffe9c7 100%);\n    color: #3b2f2a;\n    display: flex; flex-direction: column; justify-content: center;\n    padding: 0 120px; position: relative;\n  }\n  .tag { font-size: 26px; color: #c0612b; font-weight: 700; letter-spacing: 2px; margin-bottom: 24px; }\n  h1 { font-size: 84px; line-height: 1.2; font-weight: 800; }\n  h2 { font-size: 40px; font-weight: 500; color: #7a5a48; margin-top: 20px; }\n  .meta { margin-top: 64px; font-size: 28px; color: #5d4a40; }\n  .meta span + span::before { content: \"·\"; margin: 0 16px; color: #c0612b; }\n  .books { position: absolute; right: 110px; bottom: 90px; font-size: 150px; opacity: .9; }\n\u003c/style>\n\u003c/head>\n\u003cbody>\n  \u003cdiv class=\"tag\">📚 학부모 설명회\u003c/div>\n  \u003ch1>우리 반 독서 습관 만들기\u003c/h1>\n  \u003ch2>학부모 설명회\u003c/h2>\n  \u003cp class=\"meta\">\u003cspan>담임교사 이하진\u003c/span>\u003cspan>2026년 10월 26일\u003c/span>\u003c/p>\n  \u003cdiv class=\"books\">📖\u003c/div>\n\u003c/body>\n\u003c/html>\n"},{"file":"02-왜-독서-습관인가.html","title":"왜 독서 습관인가요?","html":"\u003c!DOCTYPE html>\n\u003chtml lang=\"ko\">\n\u003chead>\n\u003cmeta charset=\"UTF-8\">\n\u003ctitle>왜 독서 습관인가요?\u003c/title>\n\u003cstyle>\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  html, body { width: 1280px; height: 720px; overflow: hidden; }\n  body {\n    font-family: \"Pretendard\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", sans-serif;\n    background: #fffaf2; color: #3b2f2a; padding: 80px 100px;\n  }\n  .num { font-size: 24px; font-weight: 700; color: #c0612b; }\n  h1 { font-size: 56px; font-weight: 800; margin: 8px 0 56px; }\n  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }\n  .card { background: #fff; border-radius: 24px; padding: 40px 32px; box-shadow: 0 6px 20px rgba(160, 100, 50, .12); }\n  .icon { font-size: 56px; }\n  .card h3 { font-size: 32px; margin: 20px 0 14px; }\n  .card p { font-size: 24px; line-height: 1.6; color: #6a564b; }\n\u003c/style>\n\u003c/head>\n\u003cbody>\n  \u003cdiv class=\"num\">01\u003c/div>\n  \u003ch1>왜 ‘독서 습관’인가요?\u003c/h1>\n  \u003cdiv class=\"cards\">\n    \u003cdiv class=\"card\">\n      \u003cdiv class=\"icon\">🧠\u003c/div>\n      \u003ch3>생각하는 힘\u003c/h3>\n      \u003cp>글을 읽고 이해하는 힘은 모든 과목 공부의 바탕이 됩니다.\u003c/p>\n    \u003c/div>\n    \u003cdiv class=\"card\">\n      \u003cdiv class=\"icon\">💬\u003c/div>\n      \u003ch3>표현하는 힘\u003c/h3>\n      \u003cp>다양한 낱말과 문장을 만나며 말하기·쓰기가 풍부해집니다.\u003c/p>\n    \u003c/div>\n    \u003cdiv class=\"card\">\n      \u003cdiv class=\"icon\">🌱\u003c/div>\n      \u003ch3>스스로 하는 힘\u003c/h3>\n      \u003cp>매일 조금씩 읽는 습관이 꾸준함과 집중력을 길러 줍니다.\u003c/p>\n    \u003c/div>\n  \u003c/div>\n\u003c/body>\n\u003c/html>\n"},{"file":"03-우리-반-독서-계획.html","title":"우리 반 독서 계획","html":"\u003c!DOCTYPE html>\n\u003chtml lang=\"ko\">\n\u003chead>\n\u003cmeta charset=\"UTF-8\">\n\u003ctitle>우리 반 독서 계획\u003c/title>\n\u003cstyle>\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  html, body { width: 1280px; height: 720px; overflow: hidden; }\n  body {\n    font-family: \"Pretendard\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", sans-serif;\n    background: #fffaf2; color: #3b2f2a; padding: 80px 100px;\n  }\n  .num { font-size: 24px; font-weight: 700; color: #c0612b; }\n  h1 { font-size: 56px; font-weight: 800; margin: 8px 0 48px; }\n  ul { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 28px 40px; }\n  li { display: flex; gap: 24px; align-items: flex-start; background: #fff; border-left: 8px solid #f0a35e; border-radius: 16px; padding: 28px 30px; }\n  .icon { font-size: 44px; line-height: 1; }\n  h3 { font-size: 30px; margin-bottom: 10px; }\n  p { font-size: 23px; line-height: 1.5; color: #6a564b; }\n\u003c/style>\n\u003c/head>\n\u003cbody>\n  \u003cdiv class=\"num\">02\u003c/div>\n  \u003ch1>우리 반은 이렇게 읽어요\u003c/h1>\n  \u003cul>\n    \u003cli>\u003cspan class=\"icon\">⏰\u003c/span>\u003cdiv>\u003ch3>아침 독서 10분\u003c/h3>\u003cp>등교 후 수업 전, 모두 함께 조용히 책을 읽습니다.\u003c/p>\u003c/div>\u003c/li>\n    \u003cli>\u003cspan class=\"icon\">📚\u003c/span>\u003cdiv>\u003ch3>학급 문고\u003c/h3>\u003cp>교실 책장에서 언제든 자유롭게 빌려 읽을 수 있어요.\u003c/p>\u003c/div>\u003c/li>\n    \u003cli>\u003cspan class=\"icon\">✏️\u003c/span>\u003cdiv>\u003ch3>독서 기록장\u003c/h3>\u003cp>읽은 책 제목과 한 줄 느낌을 짧게 기록합니다.\u003c/p>\u003c/div>\u003c/li>\n    \u003cli>\u003cspan class=\"icon\">🎤\u003c/span>\u003cdiv>\u003ch3>한 달 한 번 책 나눔\u003c/h3>\u003cp>친구에게 재미있었던 책을 소개하는 시간을 가집니다.\u003c/p>\u003c/div>\u003c/li>\n  \u003c/ul>\n\u003c/body>\n\u003c/html>\n"},{"file":"04-가정에서-함께해-주세요.html","title":"가정에서 함께해 주세요","html":"\u003c!DOCTYPE html>\n\u003chtml lang=\"ko\">\n\u003chead>\n\u003cmeta charset=\"UTF-8\">\n\u003ctitle>가정에서 함께해 주세요\u003c/title>\n\u003cstyle>\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  html, body { width: 1280px; height: 720px; overflow: hidden; }\n  body {\n    font-family: \"Pretendard\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", sans-serif;\n    background: #fffaf2; color: #3b2f2a; padding: 80px 100px;\n  }\n  .num { font-size: 24px; font-weight: 700; color: #c0612b; }\n  h1 { font-size: 56px; font-weight: 800; margin: 8px 0 48px; }\n  ol { list-style: none; counter-reset: tip; }\n  li { counter-increment: tip; display: flex; align-items: center; gap: 28px; font-size: 30px; padding: 20px 0; border-bottom: 2px dashed #f1d9bd; }\n  li:last-child { border-bottom: none; }\n  li::before { content: counter(tip); flex: none; width: 56px; height: 56px; border-radius: 50%; background: #f0a35e; color: #fff; font-weight: 800; display: grid; place-items: center; }\n  b { color: #c0612b; }\n\u003c/style>\n\u003c/head>\n\u003cbody>\n  \u003cdiv class=\"num\">03\u003c/div>\n  \u003ch1>가정에서 함께해 주세요\u003c/h1>\n  \u003col>\n    \u003cli>\u003cspan>하루 \u003cb>15분\u003c/b>, 가족이 함께 책 읽는 시간을 정해 주세요.\u003c/span>\u003c/li>\n    \u003cli>\u003cspan>책은 \u003cb>아이가 직접 고르도록\u003c/b> 해 주세요. 만화책도 괜찮아요.\u003c/span>\u003c/li>\n    \u003cli>\u003cspan>“어떤 장면이 제일 재미있었어?” 하고 \u003cb>가볍게 물어봐\u003c/b> 주세요.\u003c/span>\u003c/li>\n    \u003cli>\u003cspan>읽는 동안에는 \u003cb>TV와 스마트폰을 잠시 꺼\u003c/b> 주세요.\u003c/span>\u003c/li>\n  \u003c/ol>\n\u003c/body>\n\u003c/html>\n"},{"file":"05-감사합니다.html","title":"감사합니다","html":"\u003c!DOCTYPE html>\n\u003chtml lang=\"ko\">\n\u003chead>\n\u003cmeta charset=\"UTF-8\">\n\u003ctitle>감사합니다\u003c/title>\n\u003cstyle>\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  html, body { width: 1280px; height: 720px; overflow: hidden; }\n  body {\n    font-family: \"Pretendard\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", sans-serif;\n    background: linear-gradient(135deg, #fff8ec 0%, #ffe9c7 100%);\n    color: #3b2f2a; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;\n  }\n  .icon { font-size: 110px; }\n  h1 { font-size: 76px; font-weight: 800; margin: 24px 0 20px; }\n  p { font-size: 32px; color: #6a564b; line-height: 1.6; }\n  .who { margin-top: 48px; font-size: 26px; color: #c0612b; font-weight: 700; }\n\u003c/style>\n\u003c/head>\n\u003cbody>\n  \u003cdiv class=\"icon\">🙏\u003c/div>\n  \u003ch1>감사합니다\u003c/h1>\n  \u003cp>아이들의 즐거운 책 읽기, 학교와 가정이 함께 만들어 가요.\u003cbr>궁금하신 점은 편하게 질문해 주세요.\u003c/p>\n  \u003cdiv class=\"who\">담임교사 이하진\u003c/div>\n\u003c/body>\n\u003c/html>\n"}]};
+const stage = document.getElementById('stage');
+const counter = document.getElementById('counter');
+const prevBtn = document.getElementById('btn-prev');
+const nextBtn = document.getElementById('btn-next');
+const tocList = document.getElementById('toc-list');
+const total = DECK.slides.length;
+let current = 0;
+
+const frames = DECK.slides.map((s, i) => {
+  const f = document.createElement('iframe');
+  f.title = s.title;
+  f.tabIndex = -1;
+  f.srcdoc = s.html;
+  stage.appendChild(f);
+
+  const li = document.createElement('li');
+  const b = document.createElement('button');
+  b.innerHTML = '<span class="n">' + (i + 1) + '</span>';
+  b.appendChild(document.createTextNode(s.title));
+  b.onclick = () => { go(i); closeOverlays(); };
+  li.appendChild(b);
+  tocList.appendChild(li);
+  return f;
+});
+
+function go(i) {
+  current = Math.max(0, Math.min(total - 1, i));
+  frames.forEach((f, k) => f.classList.toggle('active', k === current));
+  [...tocList.querySelectorAll('button')].forEach((b, k) => b.classList.toggle('current', k === current));
+  counter.textContent = (current + 1) + ' / ' + total;
+  prevBtn.disabled = current === 0;
+  nextBtn.disabled = current === total - 1;
+  history.replaceState(null, '', '#' + (current + 1));
+}
+
+function fit() {
+  const vp = document.getElementById('viewport');
+  const scale = Math.min(vp.clientWidth / 1280, vp.clientHeight / 720) * 0.96;
+  stage.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
+}
+
+function closeOverlays() {
+  document.querySelectorAll('.overlay.open').forEach((o) => o.classList.remove('open'));
+}
+function toggleOverlay(id) {
+  const el = document.getElementById(id);
+  const willOpen = !el.classList.contains('open');
+  closeOverlays();
+  if (willOpen) el.classList.add('open');
+  return willOpen;
+}
+
+function showQr() {
+  if (!toggleOverlay('qr')) return;
+  const url = location.href.split('#')[0];
+  const qr = qrcode(0, 'M');
+  qr.addData(unescape(encodeURIComponent(url)), 'Byte'); // UTF-8 바이트로 넣기
+  qr.make();
+  document.getElementById('qr-code').innerHTML = qr.createSvgTag({ cellSize: 8, margin: 2, scalable: true });
+  document.getElementById('qr-url').textContent = url;
+}
+
+function toggleFullscreen() {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen().catch(() => {});
+}
+
+prevBtn.onclick = () => go(current - 1);
+nextBtn.onclick = () => go(current + 1);
+document.getElementById('btn-toc').onclick = () => toggleOverlay('toc');
+document.getElementById('btn-qr').onclick = showQr;
+document.getElementById('btn-fs').onclick = toggleFullscreen;
+document.querySelectorAll('.overlay').forEach((o) => o.addEventListener('click', (e) => { if (e.target === o) closeOverlays(); }));
+document.addEventListener('fullscreenchange', () => {
+  document.getElementById('btn-fs').textContent = document.fullscreenElement ? '전체화면 끝' : '전체화면';
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(current + 1); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(current - 1); }
+  else if (e.key === 'Home') go(0);
+  else if (e.key === 'End') go(total - 1);
+  else if (e.key === 'Escape') closeOverlays();
+  else if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+
+// 휴대폰에서 좌우로 밀어 넘기기
+let touchX = null;
+document.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; }, { passive: true });
+document.addEventListener('touchend', (e) => {
+  if (touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 50) go(current + (dx < 0 ? 1 : -1));
+  touchX = null;
+});
+
+window.addEventListener('resize', fit);
+fit();
+go((parseInt(location.hash.slice(1), 10) || 1) - 1);
+</script>
+</body>
+</html>
